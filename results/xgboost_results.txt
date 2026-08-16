@@ -1,0 +1,15 @@
+SCANIA APS FAILURE PREDICTION
+XGBOOST ADVANCED MODEL
+============================================================
+
+PR-AUC: 0.8902
+ROC-AUC: 0.9952
+
+Recommended Operating Threshold
+----------------------------------------
+Threshold: 0.65
+Precision: 0.7087
+Recall: 0.9000
+F1 Score: 0.7930
+False Positives: 74.0
+False Negatives: 20.0

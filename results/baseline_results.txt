@@ -1,0 +1,23 @@
+SCANIA APS FAILURE PREDICTION
+LOGISTIC REGRESSION BASELINE
+============================================================
+
+Precision: 0.3669
+Recall: 0.9100
+F1 Score: 0.5230
+PR-AUC: 0.7276
+ROC-AUC: 0.9648
+
+Confusion Matrix:
+[[11486   314]
+ [   18   182]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+      Normal       1.00      0.97      0.99     11800
+     Failure       0.37      0.91      0.52       200
+
+    accuracy                           0.97     12000
+   macro avg       0.68      0.94      0.75     12000
+weighted avg       0.99      0.97      0.98     12000

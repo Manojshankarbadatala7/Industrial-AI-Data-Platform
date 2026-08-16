@@ -1,0 +1,40 @@
+======================================================================
+SCANIA APS FAILURE PREDICTION
+SNOWFLAKE XGBOOST MODEL
+======================================================================
+
+Dataset:
+APS_FAILURE_ML_TRAIN / APS_FAILURE_ML_TEST
+
+Features:
+- CI_000
+- AA_000
+- AH_000
+- BB_000
+- BG_000
+- BU_000
+- BV_000
+- CQ_000
+- BT_000
+- AN_000
+- AO_000
+- BH_000
+- DN_000
+- CC_000
+- BX_000
+- AQ_000
+- AP_000
+- CK_000
+- BY_000
+- BJ_000
+
+Training rows: 1600
+Testing rows: 400
+Number of features: 20
+
+Performance:
+Accuracy : 0.9825
+Precision: 0.9849
+Recall   : 0.9800
+F1 Score : 0.9825
+ROC-AUC  : 0.9981
