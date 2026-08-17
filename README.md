@@ -6,7 +6,13 @@ The project is designed around a realistic industrial data workflow rather than 
 
 ---
 
-## 🚀 Project Overview
+## 🔗 Live Demo
+
+https://industrial-ai-data-platform.streamlit.app/
+
+---
+
+# 🚀 Project Overview
 
 Unexpected equipment failures can cause production downtime, maintenance costs, and operational disruptions.
 
