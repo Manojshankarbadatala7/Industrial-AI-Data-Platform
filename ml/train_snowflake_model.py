@@ -32,10 +32,7 @@ from sklearn.metrics import (
 )
 
 
-# ============================================================
 # CONFIGURATION
-# ============================================================
-
 DATABASE = "SCANIA_AI_PLATFORM"
 SCHEMA = "ML_FEATURES"
 WAREHOUSE = "COMPUTE_WH"
@@ -69,10 +66,7 @@ FEATURES = [
 TARGET = "CLASS"
 
 
-# ============================================================
 # PROJECT PATHS
-# ============================================================
-
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)
@@ -100,10 +94,7 @@ os.makedirs(
 )
 
 
-# ============================================================
 # SNOWFLAKE CONNECTION
-# ============================================================
-
 def connect_to_snowflake():
     """
     Connect to Snowflake using username/password authentication.
@@ -144,10 +135,7 @@ def connect_to_snowflake():
     return connection
 
 
-# ============================================================
 # LOAD DATA FROM SNOWFLAKE
-# ============================================================
-
 def load_table(connection, table_name):
     """
     Load a Snowflake table into a pandas DataFrame.
@@ -192,10 +180,7 @@ def load_table(connection, table_name):
     return df
 
 
-# ============================================================
 # PREPARE DATA
-# ============================================================
-
 def prepare_data(train_df, test_df):
 
     print("\n" + "=" * 70)
@@ -276,10 +261,7 @@ def prepare_data(train_df, test_df):
     )
 
 
-# ============================================================
 # TRAIN MODEL
-# ============================================================
-
 def train_model(X_train, y_train):
 
     print("\n" + "=" * 70)
@@ -309,10 +291,7 @@ def train_model(X_train, y_train):
     return scaler, model
 
 
-# ============================================================
 # EVALUATE MODEL
-# ============================================================
-
 def evaluate_model(
     model,
     scaler,
@@ -408,10 +387,7 @@ def evaluate_model(
     return metrics
 
 
-# ============================================================
 # SAVE RESULTS
-# ============================================================
-
 def save_results(
     metrics,
     model,
@@ -543,10 +519,7 @@ def save_results(
     )
 
 
-# ============================================================
 # MAIN
-# ============================================================
-
 def main():
 
     print("\n")
@@ -571,34 +544,22 @@ def main():
 
     try:
 
-        # ----------------------------------------------------
         # CONNECT TO SNOWFLAKE
-        # ----------------------------------------------------
-
         connection = connect_to_snowflake()
 
-        # ----------------------------------------------------
         # LOAD TRAINING DATA
-        # ----------------------------------------------------
-
         train_df = load_table(
             connection,
             TRAIN_TABLE
         )
 
-        # ----------------------------------------------------
         # LOAD TESTING DATA
-        # ----------------------------------------------------
-
         test_df = load_table(
             connection,
             TEST_TABLE
         )
 
-        # ----------------------------------------------------
         # PREPARE DATA
-        # ----------------------------------------------------
-
         (
             X_train,
             X_test,
@@ -609,19 +570,13 @@ def main():
             test_df
         )
 
-        # ----------------------------------------------------
         # TRAIN MODEL
-        # ----------------------------------------------------
-
         scaler, model = train_model(
             X_train,
             y_train
         )
 
-        # ----------------------------------------------------
         # EVALUATE MODEL
-        # ----------------------------------------------------
-
         metrics = evaluate_model(
             model,
             scaler,
@@ -630,10 +585,7 @@ def main():
             len(X_train)
         )
 
-        # ----------------------------------------------------
         # SAVE RESULTS
-        # ----------------------------------------------------
-
         save_results(
             metrics,
             model,
@@ -672,9 +624,6 @@ def main():
             )
 
 
-# ============================================================
 # RUN
-# ============================================================
-
 if __name__ == "__main__":
     main()

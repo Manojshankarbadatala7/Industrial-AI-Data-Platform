@@ -24,10 +24,7 @@ import pandas as pd
 import snowflake.connector
 
 
-# ==============================================================
 # CONFIGURATION
-# ==============================================================
-
 DATABASE = "SCANIA_AI_PLATFORM"
 SCHEMA = "ML_FEATURES"
 
@@ -47,20 +44,14 @@ PREDICTION_CSV_PATH = os.path.join(
 )
 
 
-# ==============================================================
 # DISPLAY HELPERS
-# ==============================================================
-
 def print_header(title):
     print("\n" + "=" * 70)
     print(title)
     print("=" * 70)
 
 
-# ==============================================================
 # SNOWFLAKE CONNECTION
-# ==============================================================
-
 def connect_to_snowflake():
     print_header("SNOWFLAKE CONNECTION")
 
@@ -92,10 +83,7 @@ def connect_to_snowflake():
     return connection
 
 
-# ==============================================================
 # LOAD DATA FROM SNOWFLAKE
-# ==============================================================
-
 def load_table_from_snowflake(connection, table_name):
     print_header(f"LOADING {table_name}")
 
@@ -126,10 +114,7 @@ def load_table_from_snowflake(connection, table_name):
     return dataframe
 
 
-# ==============================================================
 # LOAD XGBOOST MODEL
-# ==============================================================
-
 def load_xgboost_model():
     print_header("LOADING XGBOOST MODEL")
 
@@ -149,10 +134,7 @@ def load_xgboost_model():
     model = None
     saved_features = None
 
-    # ----------------------------------------------------------
     # CASE 1: Model package saved as dictionary
-    # ----------------------------------------------------------
-
     if isinstance(saved_object, dict):
 
         print("Saved model package detected.")
@@ -179,10 +161,7 @@ def load_xgboost_model():
                 "from key: 'features'"
             )
 
-    # ----------------------------------------------------------
     # CASE 2: Model saved directly
-    # ----------------------------------------------------------
-
     else:
 
         model = saved_object
@@ -236,10 +215,7 @@ def load_xgboost_model():
     return model, saved_features
 
 
-# ==============================================================
 # PREPARE FEATURES
-# ==============================================================
-
 def prepare_features(
     test_dataframe,
     saved_features
@@ -248,10 +224,7 @@ def prepare_features(
 
     dataframe = test_dataframe.copy()
 
-    # ----------------------------------------------------------
     # Normalize column names
-    # ----------------------------------------------------------
-
     dataframe.columns = [
         str(column).upper()
         for column in dataframe.columns
@@ -262,10 +235,7 @@ def prepare_features(
         for feature in saved_features
     ]
 
-    # ----------------------------------------------------------
     # Check that all required features exist
-    # ----------------------------------------------------------
-
     missing_features = [
         feature
         for feature in saved_features
@@ -280,10 +250,7 @@ def prepare_features(
             + "\n".join(missing_features)
         )
 
-    # ----------------------------------------------------------
     # Select features in EXACT model order
-    # ----------------------------------------------------------
-
     X = dataframe[saved_features].copy()
 
     # Convert feature values to numeric
@@ -293,10 +260,7 @@ def prepare_features(
             errors="coerce"
         )
 
-    # ----------------------------------------------------------
     # Handle missing values
-    # ----------------------------------------------------------
-
     if X.isnull().any().any():
 
         missing_count = int(
@@ -329,29 +293,20 @@ def prepare_features(
     return X
 
 
-# ==============================================================
 # GENERATE PREDICTIONS
-# ==============================================================
-
 def generate_predictions(
     model,
     X
 ):
     print_header("GENERATING PREDICTIONS")
 
-    # ----------------------------------------------------------
     # Generate class predictions
-    # ----------------------------------------------------------
-
     predictions = model.predict(X)
 
     # Convert to integer
     predictions = predictions.astype(int)
 
-    # ----------------------------------------------------------
     # Generate probabilities
-    # ----------------------------------------------------------
-
     probabilities = model.predict_proba(X)
 
     # Probability of class 1 = failure
@@ -367,10 +322,7 @@ def generate_predictions(
     )
 
 
-# ==============================================================
 # CREATE PREDICTION RESULTS
-# ==============================================================
-
 def create_prediction_dataframe(
     predictions,
     failure_probabilities
@@ -379,18 +331,12 @@ def create_prediction_dataframe(
 
     result_dataframe = pd.DataFrame()
 
-    # ----------------------------------------------------------
     # Prediction
-    # ----------------------------------------------------------
-
     result_dataframe["PREDICTION"] = (
         predictions.astype(int)
     )
 
-    # ----------------------------------------------------------
     # Human-readable prediction label
-    # ----------------------------------------------------------
-
     result_dataframe[
         "PREDICTION_LABEL"
     ] = result_dataframe["PREDICTION"].map(
@@ -400,21 +346,16 @@ def create_prediction_dataframe(
         }
     )
 
-    # ----------------------------------------------------------
     # Failure probability
-    # ----------------------------------------------------------
-
     result_dataframe[
         "FAILURE_PROBABILITY"
     ] = failure_probabilities.astype(float)
 
-    # ----------------------------------------------------------
     # Risk level
     #
     # LOW    < 0.30
     # MEDIUM 0.30 - 0.70
     # HIGH   >= 0.70
-    # ----------------------------------------------------------
 
     def assign_risk(probability):
 
@@ -436,10 +377,7 @@ def create_prediction_dataframe(
     return result_dataframe
 
 
-# ==============================================================
 # SAVE LOCAL CSV
-# ==============================================================
-
 def save_predictions_locally(
     prediction_dataframe
 ):
@@ -470,10 +408,7 @@ def save_predictions_locally(
     )
 
 
-# ==============================================================
 # WRITE PREDICTIONS TO SNOWFLAKE
-# ==============================================================
-
 def save_predictions_to_snowflake(
     connection,
     prediction_dataframe
@@ -487,10 +422,7 @@ def save_predictions_to_snowflake(
         f"{PREDICTION_TABLE}"
     )
 
-    # ----------------------------------------------------------
     # Make sure the table exists
-    # ----------------------------------------------------------
-
     create_table_query = f"""
         CREATE TABLE IF NOT EXISTS {table_name} (
             PREDICTION_ID INTEGER AUTOINCREMENT,
@@ -517,10 +449,7 @@ def save_predictions_to_snowflake(
 
         print(table_name)
 
-        # ------------------------------------------------------
         # Prepare rows
-        # ------------------------------------------------------
-
         rows = []
 
         for _, row in prediction_dataframe.iterrows():
@@ -534,10 +463,7 @@ def save_predictions_to_snowflake(
                 )
             )
 
-        # ------------------------------------------------------
         # Insert predictions
-        # ------------------------------------------------------
-
         insert_query = f"""
             INSERT INTO {table_name}
             (
@@ -571,10 +497,7 @@ def save_predictions_to_snowflake(
         cursor.close()
 
 
-# ==============================================================
 # VERIFY SNOWFLAKE PREDICTIONS
-# ==============================================================
-
 def verify_snowflake_predictions(
     connection
 ):
@@ -591,10 +514,7 @@ def verify_snowflake_predictions(
 
     try:
 
-        # ------------------------------------------------------
         # Total row count
-        # ------------------------------------------------------
-
         cursor.execute(
             f"""
             SELECT COUNT(*)
@@ -609,10 +529,7 @@ def verify_snowflake_predictions(
             f"in Snowflake: {total_rows}"
         )
 
-        # ------------------------------------------------------
         # Risk distribution
-        # ------------------------------------------------------
-
         cursor.execute(
             f"""
             SELECT
@@ -635,10 +552,7 @@ def verify_snowflake_predictions(
                 f"{count}"
             )
 
-        # ------------------------------------------------------
         # Latest predictions
-        # ------------------------------------------------------
-
         cursor.execute(
             f"""
             SELECT
@@ -680,10 +594,7 @@ def verify_snowflake_predictions(
         cursor.close()
 
 
-# ==============================================================
 # DISPLAY PREDICTION SUMMARY
-# ==============================================================
-
 def display_prediction_summary(
     prediction_dataframe
 ):
@@ -765,10 +676,7 @@ def display_prediction_summary(
     )
 
 
-# ==============================================================
 # MAIN
-# ==============================================================
-
 def main():
 
     print(
@@ -792,18 +700,12 @@ def main():
 
     try:
 
-        # ------------------------------------------------------
         # 1. Connect to Snowflake
-        # ------------------------------------------------------
-
         connection = (
             connect_to_snowflake()
         )
 
-        # ------------------------------------------------------
         # 2. Load test data
-        # ------------------------------------------------------
-
         test_dataframe = (
             load_table_from_snowflake(
                 connection,
@@ -811,28 +713,19 @@ def main():
             )
         )
 
-        # ------------------------------------------------------
         # 3. Load model
-        # ------------------------------------------------------
-
         (
             model,
             saved_features
         ) = load_xgboost_model()
 
-        # ------------------------------------------------------
         # 4. Prepare features
-        # ------------------------------------------------------
-
         X = prepare_features(
             test_dataframe,
             saved_features
         )
 
-        # ------------------------------------------------------
         # 5. Generate predictions
-        # ------------------------------------------------------
-
         (
             predictions,
             failure_probabilities
@@ -841,10 +734,7 @@ def main():
             X
         )
 
-        # ------------------------------------------------------
         # 6. Create prediction dataframe
-        # ------------------------------------------------------
-
         prediction_dataframe = (
             create_prediction_dataframe(
                 predictions,
@@ -852,43 +742,28 @@ def main():
             )
         )
 
-        # ------------------------------------------------------
         # 7. Save local CSV
-        # ------------------------------------------------------
-
         save_predictions_locally(
             prediction_dataframe
         )
 
-        # ------------------------------------------------------
         # 8. Display summary
-        # ------------------------------------------------------
-
         display_prediction_summary(
             prediction_dataframe
         )
 
-        # ------------------------------------------------------
         # 9. Write predictions to Snowflake
-        # ------------------------------------------------------
-
         save_predictions_to_snowflake(
             connection,
             prediction_dataframe
         )
 
-        # ------------------------------------------------------
         # 10. Verify Snowflake table
-        # ------------------------------------------------------
-
         verify_snowflake_predictions(
             connection
         )
 
-        # ------------------------------------------------------
         # Complete
-        # ------------------------------------------------------
-
         print(
             "\n"
             + "#" * 70
@@ -924,9 +799,6 @@ def main():
             )
 
 
-# ==============================================================
 # RUN
-# ==============================================================
-
 if __name__ == "__main__":
     main()

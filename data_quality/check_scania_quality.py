@@ -18,10 +18,7 @@ from pathlib import Path
 import pandas as pd
 
 
-# ============================================================
 # CONFIGURATION
-# ============================================================
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATA_FILE = (
@@ -37,11 +34,7 @@ CHUNK_SIZE = 5_000
 # The first 20 lines are documentation.
 SKIP_ROWS = 20
 
-
-# ============================================================
 # BASIC INFORMATION
-# ============================================================
-
 def inspect_structure():
 
     print("\n" + "=" * 70)
@@ -87,10 +80,7 @@ def inspect_structure():
     return columns, data_rows
 
 
-# ============================================================
 # MISSING VALUE ANALYSIS
-# ============================================================
-
 def analyze_missing_values():
 
     print("\n" + "=" * 70)
@@ -169,10 +159,7 @@ def analyze_missing_values():
     return result
 
 
-# ============================================================
 # CONSTANT COLUMN ANALYSIS
-# ============================================================
-
 def analyze_constant_columns():
 
     print("\n" + "=" * 70)
@@ -244,10 +231,7 @@ def analyze_constant_columns():
     return constant_columns
 
 
-# ============================================================
 # TARGET ANALYSIS
-# ============================================================
-
 def analyze_target():
 
     print("\n" + "=" * 70)
@@ -295,10 +279,7 @@ def analyze_target():
     )
 
 
-# ============================================================
 # DUPLICATE ANALYSIS
-# ============================================================
-
 def analyze_duplicates():
 
     print("\n" + "=" * 70)
@@ -348,10 +329,7 @@ def analyze_duplicates():
     )
 
 
-# ============================================================
 # MAIN
-# ============================================================
-
 def main():
 
     print("\n" + "#" * 70)
